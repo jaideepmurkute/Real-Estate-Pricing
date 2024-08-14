@@ -1,0 +1,26 @@
+# Communication Between Containers - API and Frontend
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./real_estate_frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
+    networks:
+      - real_estate_network
+
+  api:
+    build:
+      context: ./real_estate_api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - real_estate_network
+
+networks:
+  real_estate_network:
+    driver: bridge

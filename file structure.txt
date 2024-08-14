@@ -1,0 +1,62 @@
+real_estate_project/
+│
+├── data/                        # Data Directory
+│   ├── raw/                     # Raw Zillow dataset files
+│   ├── processed/               # Processed data files (after cleaning, transformation)
+│   └── README.md                # Documentation for data directory
+│
+├── analysis/                    # Data Analysis Directory
+│   ├── exploratory.ipynb        # Jupyter notebook for exploratory data analysis (EDA)
+│   ├── data_cleaning.py         # Script for cleaning and preprocessing data
+│   ├── feature_engineering.py   # Script for feature extraction/engineering
+│   ├── visualization.py         # Script for generating visualizations
+│   └── README.md                # Documentation for analysis directory
+│
+├── ml/                          # Machine Learning Directory
+│   ├── model_training.py        # Script for training the ML model
+│   ├── model_evaluation.py      # Script for evaluating the ML model
+│   ├── models/                  # Directory to save trained models
+│   │   └── price_model.pkl      # Serialized ML model
+│   ├── prediction.py            # Script for making predictions with the ML model
+│   └── README.md                # Documentation for ML directory
+│
+├── real_estate_api/             # Backend (FastAPI) Directory
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py              # Main FastAPI application
+│   │   ├── models.py            # Data models (if any)
+│   │   ├── schemas.py           # Pydantic schemas for data validation
+│   │   ├── crud.py              # Functions to interact with the database
+│   │   ├── database.py          # Database connection and setup
+│   │   ├── routers/
+│   │   │   ├── __init__.py
+│   │   │   ├── properties.py    # Endpoints for property-related operations
+│   │   │   ├── search.py        # Endpoints for search operations
+│   │   └── utils.py             # Utility functions
+│   ├── tests/                   # Test cases for backend
+│   │   ├── __init__.py
+│   │   └── test_main.py
+│   ├── Dockerfile               # Dockerfile for backend
+│   ├── requirements.txt         # Python dependencies
+│   └── README.md                # Documentation for backend
+│
+├── real_estate_frontend/        # Frontend (Vue.js) Directory
+│   ├── public/
+│   │   └── index.html           # Main HTML file
+│   ├── src/
+│   │   ├── assets/              # Static assets like images and fonts
+│   │   ├── components/          # Vue.js components
+│   │   │   ├── MapView.vue      # Component for displaying the map
+│   │   │   ├── SearchForm.vue   # Component for search form
+│   │   │   └── PropertyList.vue # Component for listing properties
+│   │   ├── views/               # Views for different pages
+│   │   │   └── Home.vue         # Main home view
+│   │   ├── App.vue              # Main Vue.js application component
+│   │   ├── main.js              # Entry point for Vue.js app
+│   ├── Dockerfile               # Dockerfile for frontend
+│   ├── package.json             # Node.js dependencies
+│   ├── package-lock.json        # Lockfile for Node.js dependencies
+│   └── README.md                # Documentation for frontend
+│
+├── docker-compose.yml           # Docker Compose file to manage both services
+└── README.md                    # Project documentation
