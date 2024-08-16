@@ -4,20 +4,21 @@ real_estate_project/
 │   ├── raw/                     # Raw Zillow dataset files
 │   ├── processed/               # Processed data files (after cleaning, transformation)
 │   └── README.md                # Documentation for data directory
-│
-├── analysis/                    # Data Analysis Directory
-│   ├── exploratory.ipynb        # Jupyter notebook for exploratory data analysis (EDA)
+|
+├── data_analysis_preprocessing/                    # Data Analysis Directory
+│   ├── analysis_EDA.ipynb        # Jupyter notebook for exploratory data analysis (EDA)
 │   ├── data_cleaning.py         # Script for cleaning and preprocessing data
-│   ├── feature_engineering.py   # Script for feature extraction/engineering
-│   ├── visualization.py         # Script for generating visualizations
+│   |── utils.py                # utility functions
 │   └── README.md                # Documentation for analysis directory
-│
+|
 ├── ml/                          # Machine Learning Directory
 │   ├── model_training.py        # Script for training the ML model
 │   ├── model_evaluation.py      # Script for evaluating the ML model
-│   ├── models/                  # Directory to save trained models
+|   |── feature_engineering.py   # Script for feature extraction/engineering
+│   ├── models_store/            # Directory to save trained models
 │   │   └── price_model.pkl      # Serialized ML model
 │   ├── prediction.py            # Script for making predictions with the ML model
+|   |── utils.py                 # utility functions for modeling
 │   └── README.md                # Documentation for ML directory
 │
 ├── real_estate_api/             # Backend (FastAPI) Directory

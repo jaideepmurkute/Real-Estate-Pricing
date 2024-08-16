@@ -1,0 +1,15 @@
+To run the FastAPI application, navigate to the real_estate_api directory and use the following command:
+uvicorn app.main:app --reload
+
+Uvicorn running on http://127.0.0.1:8000 
+Documentation can be accessed via: http://127.0.0.1:8000/docs
+
+# -----------------------------------------------------------------------------
+
+Running the Vue.js Application: 
+
+Navigate to the real_estate_frontend directory 
+    > real_estate_frontend > real_estate_frontend > 
+and run:
+    npm run serve
+This will start the Vue.js development server, and you can access the frontend at http://localhost:8080.
