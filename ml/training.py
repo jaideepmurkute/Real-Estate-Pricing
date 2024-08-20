@@ -18,8 +18,7 @@ from sklearn.base import BaseEstimator
 import tensorflow as tf
 from tqdm import tqdm
 
-from utils import *
-from ml.utils import *
+from .utils import *
 
 # ---------------------------------------------------------------
 

@@ -21,7 +21,7 @@ import tensorflow as tf
 import pickle
 from tqdm import tqdm
 
-from ml.utils import *
+from .utils import *
 
 '''
 Tensorflow logging levels:
