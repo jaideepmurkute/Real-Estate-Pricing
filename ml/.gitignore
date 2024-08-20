@@ -1,0 +1,7 @@
+
+# dont backup the model checkpoints
+model_store/*
+!model_store/.gitkeep
+
+# dont backup pytest cache
+.pytest_cache/*

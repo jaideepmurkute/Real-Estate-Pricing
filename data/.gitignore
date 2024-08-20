@@ -1,4 +1,0 @@
-# ignore everything in node_modules
-*
-# except for this file
-!.gitignore

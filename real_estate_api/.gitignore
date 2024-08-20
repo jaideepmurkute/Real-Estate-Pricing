@@ -1,0 +1,3 @@
+
+# don't commit the database file
+*.db

@@ -1,3 +1,7 @@
+
+# do not sync model checkpoints
+models_store/
+
 # ignore ide files
 .idea/
 .vscode/
@@ -7,6 +11,7 @@
 **/*.pyc  
 **/*.pyo
 **/*.pyd
+.pytetst_cache/
 
 #ignore virtualenv
 venv/
