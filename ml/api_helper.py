@@ -166,44 +166,73 @@ def predict(config: Dict, forecast_date: Optional[str]=None, return_data: Option
     # can use following: index for : 
     # 'Metro_median_sale_price_uc_sfrcondo_sm_sa_month'
     # 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_month'
+    
     feat_to_return = f'Metro_{config['return_aggr_type']}_{config['return_data_type']}_uc_sfrcondo_sm_sa_{config["granularity"]}'
-    # print("prediction: ", aggr_preds_df[feat_to_return])
+    forecast_value = aggr_preds_df[feat_to_return]
+    forecast_value = round(forecast_value, 2)
     
-    # if return_data:
-    #     ret_df = train_df.reset_index()[["Date", feat_to_return]]
-    #     ret_df.rename(columns={feat_to_return: 'Price'}, inplace=True)
-    #     print("cols in ret_df after reset_index: ", ret_df.columns)
-    #     print("Returning data...")
-    #     print(ret_df)
+    if return_data:
+        train_df.columns = feature_names
         
-    #     print('-----------------')
-    #     return aggr_preds_df[feat_to_return], train_df[['Date', feat_to_return]]
+        train_df = train_df.reset_index()
+        train_df.rename({'index': 'Date'}, axis=1, inplace=True)
+        
+        ret_df = train_df[["Date", feat_to_return]]
+        ret_df = ret_df.rename(columns={feat_to_return: 'Price'})
+        
+        return forecast_value, ret_df
     
-    # return aggr_preds_df[feat_to_return], None
+    return forecast_value, None
 
+def get_states_list(config: Dict) -> List[str]:
+    # as of now, not choosing between month and week; since as of now we select state first; 
+    # without selecting the granularity
+    
+    monthly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_month.csv'
+    # weekly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_week.csv',
+    
+    df = pd.read_csv(os.path.join(config['data_dir'], monthly_ref_fname))
+    # df["StateName"].dropna(inplace=True) # drop NaN values - also the country level record
+    df.dropna(subset=["StateName"], inplace=True)
+    
+    states_list = df["StateName"].unique().tolist()
+    print(">>>> states_list: ", states_list)
+    return states_list
 
-if __name__ == '__main__':
-    config = {
-        'region_name': 'Adrian, MI', # Adrian, MI
-        'granularity': 'month',
-        'look_back': 6, 
-        'n_folds': 3, 
-        'eval_batch_size': 64, 
-        
-        'return_data_type': 'sale_price',
-        'return_aggr_type': 'median',
-        
-        'handle_outliers': False,
-        'seed': 42, 
-        
-        'data_dir': os.path.join('..', 'data', 'zillow'), 
-        'region_data_store_dir': os.path.join('..', 'data', 'zillow', 'region_data_store'),
-        'model_store_dir': os.path.join('model_store'),
-    }
+def get_state_regions(config: Dict, state: str) -> List[str]:
+    monthly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_month.csv'
+    # weekly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_week.csv',
+    df = pd.read_csv(os.path.join(config['data_dir'], monthly_ref_fname))
+    df['StateName'].dropna(inplace=True) # drop NaN values - also the country level record
+    
+    states = df["StateName"].unique().tolist()
+    state_regions_dict = df.groupby("StateName")["RegionName"].unique().to_dict()
+    
+    return state_regions_dict[state]
+    
 
-    housekeeping(config)
-    check_input(config)
-    predict(config)
+# if __name__ == '__main__':
+#     config = {
+#         'region_name': 'Adrian, MI', # Adrian, MI
+#         'granularity': 'month',
+#         'look_back': 6, 
+#         'n_folds': 3, 
+#         'eval_batch_size': 64, 
+        
+#         'return_data_type': 'sale_price',
+#         'return_aggr_type': 'median',
+        
+#         'handle_outliers': False,
+#         'seed': 42, 
+        
+#         'data_dir': os.path.join('..', 'data', 'zillow'), 
+#         'region_data_store_dir': os.path.join('..', 'data', 'zillow', 'region_data_store'),
+#         'model_store_dir': os.path.join('model_store'),
+#     }
+
+#     housekeeping(config)
+#     check_input(config)
+#     forecast_value, data_df = predict(config)
     
     
 

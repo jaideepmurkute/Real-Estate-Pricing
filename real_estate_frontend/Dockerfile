@@ -1,23 +1,13 @@
-# Dockerfile for real_estate_frontend
-FROM node:18-alpine
-
-# Set working directory
+# Stage 1: Build the Vue.js app
+FROM node:14 as build-stage
 WORKDIR /app
-
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json ./
-
-# Install dependencies
+COPY package*.json ./
 RUN npm install
-
-# Copy all other files
 COPY . .
-
-# Build the application (if applicable)
 RUN npm run build
 
-# Expose the port the app runs on
-EXPOSE 8080
-
-# Start the app
-CMD ["npm", "run", "serve"]
+# Stage 2: Serve the app with Nginx
+FROM nginx:alpine
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

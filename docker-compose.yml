@@ -1,26 +1,48 @@
-# Communication Between Containers - API and Frontend
-version: '3'
+version: '3.8'
+
 services:
-  frontend:
-    build:
-      context: ./real_estate_frontend
-      dockerfile: Dockerfile
+  backend:
+    build: ./real_estate_api
+    container_name: real_estate_api
     ports:
-      - "8080:8080"
+      - "8000:80"
+    volumes:
+      - ./real_estate_api:/app
     depends_on:
-      - api
-    networks:
-      - real_estate_network
+      - db
 
-  api:
-    build:
-      context: ./real_estate_api
-      dockerfile: Dockerfile
+  frontend:
+    build: ./real_estate_frontend
+    container_name: real_estate_frontend
     ports:
-      - "8000:8000"
-    networks:
-      - real_estate_network
+      - "8080:80"
+    volumes:
+      - ./real_estate_frontend:/app
 
-networks:
-  real_estate_network:
-    driver: bridge
+  db:
+    image: mysql:5.7
+    container_name: real_estate_db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: real_estate
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+
+
+# Steps to build and run the project
+# Navigate to project directory
+# cd path/to/your/project
+
+# # Build and start containers
+# docker-compose up --build
+
+# # Check running containers
+# docker ps
+
+# # Access frontend at http://localhost:8080
+# # Access backend at http://localhost:8000

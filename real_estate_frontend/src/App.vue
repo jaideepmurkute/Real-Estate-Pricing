@@ -1,4 +1,18 @@
-<!-- Includes the search form, property list, and map view -->
+
+<template>
+  <div id="app">
+    <router-view/>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'App'
+}
+</script>
+
+
+<!-- Includes the search form, property list, and map view
 
 <template>
     <div id="app">
@@ -44,3 +58,5 @@
     margin-top: 60px;
   }
   </style>
+
+   -->
