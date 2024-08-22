@@ -100,7 +100,7 @@ def get_region_data(config: Dict, granularity: str, region_name: str) -> pd.Data
     fpath = os.path.join(config['region_data_store_dir'], f'all_data_df_{granularity}_{region_name}.csv')
     if not os.path.exists(fpath):
         raise FileNotFoundError(fpath)
-    
+    print(f"Reading data from {fpath}")
     df = pd.read_csv(fpath, index_col=0)
     
     return df

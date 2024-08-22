@@ -1,3 +1,5 @@
+
+<!-- --------------------- HTML Template ---------------------- -->
 <template>
   <div id="app">
     <div class="header-container">
@@ -8,6 +10,7 @@
   </div>
 </template>
 
+<!-- --------------------- Javascript functions ---------------------- -->
 <script>
 import ForecastChart from './components/Forecast.vue';
 
@@ -19,6 +22,7 @@ export default {
 }
 </script>
 
+<!-- --------------------- CSS Styles ---------------------- -->
 <style>
 html, body {
   height: 100%;

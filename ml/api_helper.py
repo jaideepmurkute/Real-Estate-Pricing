@@ -135,7 +135,8 @@ def update_forecast_date(config: dict, train_df: pd.DataFrame, forecast_date: Op
     
     return forecast_date
 
-def predict(config: Dict, forecast_date: Optional[str]=None, return_data: Optional[bool] = False) -> None:
+def predict(config: Dict, requested_feature: str, forecast_date: Optional[str]=None, 
+            return_data: Optional[bool] = False) -> None:
     """
     Predicts the real estate pricing based on the given configuration and forecast date.
     
@@ -162,23 +163,66 @@ def predict(config: Dict, forecast_date: Optional[str]=None, return_data: Option
         
     aggr_preds = test_model(config, train_df)
     aggr_preds_df = pd.Series(aggr_preds, index=feature_names)
+    aggr_preds_df = aggr_preds_df[~aggr_preds_df.index.duplicated(keep=False)]
     
     # can use following: index for : 
     # 'Metro_median_sale_price_uc_sfrcondo_sm_sa_month'
     # 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_month'
     
-    feat_to_return = f'Metro_{config['return_aggr_type']}_{config['return_data_type']}_uc_sfrcondo_sm_sa_{config["granularity"]}'
-    forecast_value = aggr_preds_df[feat_to_return]
-    forecast_value = round(forecast_value, 2)
+    # feat_to_return = f'Metro_{config['return_aggr_type']}_{config['return_data_type']}_uc_sfrcondo_sm_sa_{config["granularity"]}'
+    # forecast_value = aggr_preds_df[feat_to_return]
+    
+    data_featname_UI_featname_map = {
+        'Mean Sale Price': 'mean_sale_price',
+        'Median Sale Price': 'median_sale_price',
+        'Pct. Sold Above List': 'pct_sold_above_list',
+        'Pct. Sold Below List': 'pct_sold_below_list',
+        'Sale Price to List Ratio': 'sale_to_list',
+        'Market Temperature Index': 'market_temp_index',
+        'Zillow Home Value Index': 'zhvi',
+        'Zillow Home Value Forecast': 'zhvf',
+    }
+    # Note there can be >1 coumns matching the pattern; for now, we are jus returning the first
+    # Like ignorring raw / sa / sm_sa etc.
+    # print("aggr_preds_df.index.values: ", aggr_preds_df.index.values)
+    # print("aggr_preds_df: ", aggr_preds_df)
+    # print("data_featname_UI_featname_map.values(): ", data_featname_UI_featname_map.values())
+    
+    found = False
+    feat_to_return = None
+    # for pattern_str in data_featname_UI_featname_map.values():
+    pattern_str = data_featname_UI_featname_map[requested_feature]
+    for data_featname in aggr_preds_df.index.values:
+        if pattern_str in data_featname:
+            feat_to_return = data_featname
+            found = True
+            break
+     
+    # print("&%&^$^feat_to_return: ", feat_to_return)
+    # print("matched pattern_str: ", pattern_str)
+    if feat_to_return is None:
+        forecast_value = 0
+    else:
+        forecast_value = aggr_preds_df[feat_to_return]
+    
+    # print("forecast_value: ", forecast_value)
+    forecast_value = round(forecast_value, 3)
     
     if return_data:
+        
         train_df.columns = feature_names
         
         train_df = train_df.reset_index()
         train_df.rename({'index': 'Date'}, axis=1, inplace=True)
         
-        ret_df = train_df[["Date", feat_to_return]]
-        ret_df = ret_df.rename(columns={feat_to_return: 'Price'})
+        if feat_to_return is None:
+            ret_df = train_df.tail(n=6)
+            ret_df.Price = 0
+            return forecast_value, ret_df
+        else:
+            ret_df = train_df[["Date", feat_to_return]]
+            ret_df = ret_df.rename(columns={feat_to_return: 'Price'})
+            ret_df['Price'] = ret_df['Price'].round(3)
         
         return forecast_value, ret_df
     
@@ -192,47 +236,60 @@ def get_states_list(config: Dict) -> List[str]:
     # weekly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_week.csv',
     
     df = pd.read_csv(os.path.join(config['data_dir'], monthly_ref_fname))
-    # df["StateName"].dropna(inplace=True) # drop NaN values - also the country level record
     df.dropna(subset=["StateName"], inplace=True)
-    
     states_list = df["StateName"].unique().tolist()
-    print(">>>> states_list: ", states_list)
+    
     return states_list
 
 def get_state_regions(config: Dict, state: str) -> List[str]:
     monthly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_month.csv'
     # weekly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_week.csv',
+    
     df = pd.read_csv(os.path.join(config['data_dir'], monthly_ref_fname))
-    df['StateName'].dropna(inplace=True) # drop NaN values - also the country level record
+    # state_regions_dict = df.groupby("StateName")["RegionName"].unique().to_dict()
     
-    states = df["StateName"].unique().tolist()
-    state_regions_dict = df.groupby("StateName")["RegionName"].unique().to_dict()
+    df = df[df["StateName"] == state]
+    df.dropna(subset=["RegionName"], inplace=True)
+    regions_list = df["RegionName"].unique().tolist()
     
-    return state_regions_dict[state]
+    return regions_list
     
-
-# if __name__ == '__main__':
-#     config = {
-#         'region_name': 'Adrian, MI', # Adrian, MI
-#         'granularity': 'month',
-#         'look_back': 6, 
-#         'n_folds': 3, 
-#         'eval_batch_size': 64, 
-        
-#         'return_data_type': 'sale_price',
-#         'return_aggr_type': 'median',
-        
-#         'handle_outliers': False,
-#         'seed': 42, 
-        
-#         'data_dir': os.path.join('..', 'data', 'zillow'), 
-#         'region_data_store_dir': os.path.join('..', 'data', 'zillow', 'region_data_store'),
-#         'model_store_dir': os.path.join('model_store'),
-#     }
-
-#     housekeeping(config)
-#     check_input(config)
-#     forecast_value, data_df = predict(config)
+def get_features_list(config: Dict, state: str, region: str) -> List[str]:
+    # as of now, not choosing between month and week; since as of now we select state first; 
+    # without selecting the granularity
     
+    # features_list = ['Mean Sale Price', 'Median Sale Price', 
+    #                  'Pct. Sold Above List', 'Pct. Sold Below List', 
+    #                  'Sale Price to List Ratio']
+    
+    config = {
+        'region_data_store_dir': os.path.join(config['data_dir'], 'region_data_store'),
+        'region_name': region,
+        'granularity': 'month',
+    }
+    
+    # read the data for the region
+    df = get_region_data(config, config['granularity'], region)
+    
+    # patterns in the data file values to be matched with the UI feature names
+    data_featname_UI_featname_map = {
+        'mean_sale_price': 'Mean Sale Price',
+        'median_sale_price': 'Median Sale Price',
+        'pct_sold_above_list': 'Pct. Sold Above List',
+        'pct_sold_below_list': 'Pct. Sold Below List',
+        'sale_to_list': 'Sale Price to List Ratio',
+        'market_temp_index': 'Market Temperature Index',
+        'zhvi': 'Zillow Home Value Index',
+        'zhvf': 'Zillow Home Value Forecast',
+    }
+    
+    supported_features = set()
+    for feature_name in df.index.values:
+        for key in data_featname_UI_featname_map.keys():
+            if key in feature_name:
+                ui_feature_name = data_featname_UI_featname_map[key]
+                supported_features.add(ui_feature_name)
+    
+    return list(supported_features)
     
 

@@ -1,3 +1,5 @@
+
+<!-- ------------------ HTML Template ------------------------ -->
 <template>
   <div>
     <!-- <h1>Real Estate Forecast</h1> -->
@@ -38,7 +40,7 @@
           <tbody>
             <tr v-for="item in historicalData" :key="item.Date">
               <td>{{ item.Date }}</td>
-              <td>{{ item.Price }}</td>
+              <td>{{ item.Price }}</td> 
             </tr>
           </tbody>
         </table>
@@ -52,9 +54,10 @@
   </div>
 </template>
 
+<!-- ------------------ Javascript functions -->
 <script>
 import axios from 'axios';
-import { ref, onMounted, nextTick, computed } from 'vue';
+import { ref, onMounted, nextTick, computed, watch } from 'vue';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-date-fns'; // Import the date adapter
 
@@ -63,7 +66,12 @@ export default {
   setup() {
     const states = ref([]);
     const regions = ref([]);
-    const features = ref(['Price', 'Ratio']);
+    // const features = ref(['Price', 'Ratio']);
+    // const features = ref(['Mean Sale Price', 'Median Sale Price', 
+    //                 'Pct. Sold Above List', 'Pct. Sold Below List', 
+    //                 'Sale Price to List Ratio',
+    //               ]);
+    const features = ref([]);
     const selectedState = ref('');
     const selectedRegion = ref('');
     const selectedFeature = ref('');
@@ -74,7 +82,7 @@ export default {
     const fetchStates = async () => {
       try {
         const response = await axios.get('http://localhost:8000/states');
-        console.log('States fetched:', response.data);
+        // console.log('States fetched:', response.data);
         states.value = response.data;
       } catch (error) {
         console.error('Error fetching states:', error);
@@ -84,22 +92,32 @@ export default {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/regions?state=${selectedState.value}`);
-        console.log('Regions fetched:', response.data);
+        // console.log('Regions fetched:', response.data);
         regions.value = response.data;
       } catch (error) {
         console.error('Error fetching regions:', error);
       }
     };
 
+    const fetchFeatures = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/features?state=${selectedState.value}&region=${selectedRegion.value}`);
+        // console.log('Features fetched:', response.data);
+        features.value = response.data;
+      } catch (error) {
+        console.error('Error fetching features:', error);
+      }
+    };
+
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/data?state=${selectedState.value}&region=${selectedRegion.value}&feature=${selectedFeature.value}`);
-        console.log('Data fetched:', response.data);
+        // console.log('Data fetched:', response.data);
         historicalData.value = response.data.historical;
         forecast.value = response.data.forecast;
-        console.log('Historical Data:', historicalData.value);
-        console.log('Forecast:', forecast.value);
-        await nextTick(); // Ensure DOM is updated before rendering the chart
+        // console.log('Historical Data:', historicalData.value);
+        // console.log('Forecast:', forecast.value);
+        await nextTick(); // Ensures DOM is updated before rendering the chart
         updateChart(); // Update the chart with new data
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -139,15 +157,7 @@ export default {
       });
     };
 
-    // const updateChart = () => {
-    //   if (chartInstance.value) {
-    //     chartInstance.value.data.labels = historicalData.value.map(item => item.Date);
-    //     chartInstance.value.data.datasets[0].data = historicalData.value.map(item => item.Price);
-    //     chartInstance.value.update();
-    //   } else {
-    //     renderChart();
-    //   }
-    // };
+    // Create a new chart and update the existing chart
     const updateChart = () => {
       if (chartInstance.value) {
         chartInstance.value.destroy(); // Destroy the existing chart instance
@@ -156,17 +166,25 @@ export default {
     };
     
     const formattedForecast = computed(() => {
-      return forecast.value !== null ? forecast.value.toFixed(2) : null;
+      return forecast.value !== null ? forecast.value.toFixed(2) : null;  // round to 2 places after decimal point
     });
 
     onMounted(() => {
       fetchStates();
     });
 
+    // Watch for changes in selectedState and selectedRegion and fetch features accordingly
+    watch([selectedState, selectedRegion], ([newState, newRegion]) => {
+      if (newState && newRegion) {
+        fetchFeatures();
+      }
+    });
+    
     return {
       states,
       regions,
       features,
+      //fetchFeatures,
       selectedState,
       selectedRegion,
       selectedFeature,
@@ -180,6 +198,7 @@ export default {
 };
 </script>
 
+<!-- ---------------- CSS Styles ------------------------ -->
 <style scoped>
 .dropdown {
   width: 200px; /* Set a fixed width for the dropdowns */

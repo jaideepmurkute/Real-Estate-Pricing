@@ -12,11 +12,14 @@ import pandas as pd
 from fastapi.responses import JSONResponse
 from .api_requestor import *
 
+# ----------------- Database Setup ----------------- #
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
+# ----------------- FastAPI App ----------------- #
 app = FastAPI()
 
+# ----------------- Middleware ----------------- #
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
@@ -26,15 +29,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ----------------- Routers ----------------- #
 # Include routers
 app.include_router(properties.router)
 app.include_router(search.router)
 
-
-# class DataResponse(BaseModel):
-#     data: List[int]
-#     forecast: int
-
+# ----------------- Pydantic Models ----------------- #
 class HistoricalData(BaseModel):
     Date: str
     Price: float
@@ -43,111 +43,58 @@ class ForecastResponse(BaseModel):
     historical: List[HistoricalData]
     forecast: float
 
+# ----------------- API Endpoints ----------------- #
    
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Real Estate Price Search and Prediction API"}
+    return {"message": "Welcome to the Real Estate Price Search and Forecasting API"}
 
 @app.get("/states", response_model=List[str])
 def fetch_states():
-    # Return a list of states
-    # return {"message": "Welcome to the Real Estate Price Search and Prediction API"}
-    # print("fetch_states called...")
-    # return ["NY", "CA", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"]
+    # Response: A list of supported states.
     states_list = state_list_requestor()
-    # print("states_list: ", states_list)
     return states_list
 
+'''
+Using FastAPI's Query helps you:
+    Validate Input: Ensure that the input meets certain criteria (e.g., minimum length, pattern).
+    Provide Metadata: Add descriptions, titles, and examples for better API documentation.
+    Set Defaults: Define default values for query parameters.
+
+FastAPI's Query Parameters:
+    ... : indicates that the parameter is required
+    description: parameter description which can be displayed in API documentation
+    default: default value for the parameter
+'''
 @app.get("/regions", response_model=List[str])
 def fetch_regions(state: str = Query(..., description="The state for which to fetch regions")):
-    # Response: List of regions for the selected state
-    # return ["New York, NY", "Chicago, IL"]
-    # print("fetch_regions called... wit state: ", state)
-    
-    # state_region_map = {
-    #     "NY": ["New York, NY", "Buffalo, NY"],
-    #     "CA": ["Los Angeles, CA", "San Francisco, CA"],
-    #     "TX": ["Houston, TX", "Dallas, TX"],
-    #     "FL": ["Miami, FL", "Orlando, FL"],
-    #     "IL": ["Chicago, IL", "Springfield, IL"],
-    #     "PA": ["Philadelphia, PA", "Pittsburgh, PA"],
-    #     "OH": ["Columbus, OH", "Cleveland, OH"],
-    #     "GA": ["Atlanta, GA", "Savannah, GA"],
-    #     "NC": ["Charlotte, NC", "Raleigh, NC"],
-    #     "MI": ["Detroit, MI", "Grand Rapids, MI"]
-    # }
-    # return state_region_map[state]
-    
+    # Response: A list of regions for the selected state.
     regions = state_regions_requestor(state) 
-    # print("regions: ", regions)
     return regions
-    
-# @app.get("/data", response_model=DataResponse)
-# def fetch_data_forecast(
-#     state: str = Query(..., description="The state for which to fetch data"),
-#     region: str = Query(..., description="The region for which to fetch data"),
-#     feature: str = Query(..., description="The feature for which to fetch forecast")
-#     ):
-#     # console.log("fetch_data_forecast called...")
-#     print("fetch_data_forecast called...")
-#     # Response: Data for the last 6 months and forecasted value for the feature
-#     # return {"message": "Welcome to the Real Estate Price Search and Prediction API"}
-    
-#     return {"data": [100, 200, 300, 400, 500, 600], "forecast": 700}
-    
 
-# @app.get("/data")
-# async def fetch_data_forecast(state: str, region: str, feature: str):
-#     print("fetch_data_forecast called...")
-#     data = pd.DataFrame({
-#         'Date': ['2021-01-01', '2021-02-01', '2021-03-01', '2021-04-01', '2021-05-01', '2021-06-01'],
-#         'Price': [100, 200, 300, 400, 500, 600]
-#     })
-#     return JSONResponse(content=data.to_dict(orient='records'))
-
+@app.get("/features", response_model=List[str])
+def fetch_features(state: str = Query(..., description="The state for which to fetch supported features"), 
+                   region: str = Query(..., description="The region for which to fetch supported features")):
+    # Response: A list of supported features; given state and region.
+    features_list = feature_list_requestor(state, region)
+    # print("API main: features_list: ", features_list)
+    return features_list
 
 @app.get("/data", response_model=ForecastResponse)
 async def fetch_data_forecast(state: str, region: str, feature: str):
-    # print("fetch_data_forecast called...")
+    forecast_value, historical_data = data_and_forecast_requestor(state, region, feature, 
+                                                            granularity='month', look_back=6)
+    # if historical_data is None:
+    #     # historical_data = pd.DataFrame(data=[['Unavailable', 'Unavailable']], columns=['Date', 'Price'])  # Create an empty DataFrame with the required columns
+    #     historical_data = pd.DataFrame({'Date': [], 'Price': ['Unavailable']})
+    # else:
     
-    # Historical data
-    # historical_data = pd.DataFrame({
-    #     'Date': ['2021-01-01', '2021-02-01', '2021-03-01', '2021-04-01', '2021-05-01', '2021-06-01'],
-    #     'Price': [100, 200, 300, 400, 500, 600]
-    # })
-    
-    # Forecasted value (example)
-    # forecast_value = 700
-    forecast_value, historical_data = data_and_forecast_requestor(region, 'month', 6)
-    
-    # flip the order of the historical data
-    historical_data = historical_data[::-1]
+    historical_data = historical_data[::-1]  # reverse the data order to show the latest data first
     
     
-    # print("forecast_value: ", forecast_value)
-    # print("historical_data: ", historical_data)
-    
-    # print("type(forecast_value): ", type(forecast_value))
-    # print("historical_data.dtypes: ", historical_data.dtypes)
-    
-    '''
-    forecast_value:  401906.1
-    
-    historical_data:  feature_name        Date     Price
-    0             2024-01-31  567935.0
-    1             2024-02-29  570319.0
-    2             2024-03-31  574555.0
-    3             2024-04-30  580204.0
-    4             2024-05-31  591263.0
-    5             2024-06-30  603073.0
-    '''
     response = {
         "historical": historical_data.to_dict(orient='records'),
         "forecast": float(forecast_value)
     }
-    
-    # print("type(response['forecast']): ", type(response['forecast']))
-    # for item in response["historical"]:
-    #     print("type(item['Price']): ", type(item['Price']))
     
     return JSONResponse(content=response)

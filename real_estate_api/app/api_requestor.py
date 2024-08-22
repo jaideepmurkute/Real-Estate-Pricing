@@ -66,7 +66,8 @@ def generate_prediction_config(region_name: str, granularity: str, look_back: in
     return config
     
     
-def data_and_forecast_requestor(region_name: str, granularity: str, look_back: int) -> int:
+def data_and_forecast_requestor(state: str, region_name: str, feature: str, granularity: str, 
+                                look_back: int) -> int:
     """
         Handles Forecasting calls for the real estate pricing for a given region.
         Generates the prediction configuration and calls the ml.prediction module to get the forecast value.
@@ -82,7 +83,7 @@ def data_and_forecast_requestor(region_name: str, granularity: str, look_back: i
     config = generate_prediction_config(region_name, granularity, look_back)
     api_helper.housekeeping(config)
     api_helper.check_input(config)
-    return api_helper.predict(config, return_data=True)
+    return api_helper.predict(config, feature, return_data=True)
 
 def state_list_requestor() -> List[str]:
     """
@@ -111,5 +112,18 @@ def state_regions_requestor(state: str) -> List[str]:
         'data_dir': os.path.join('..', 'data', 'zillow'),
     }
     return api_helper.get_state_regions(config, state)
+
+def feature_list_requestor(state: str, region: str) -> List[str]:
+    """
+        Handles the request for the list of supported features; given state and regions.
+        Calls the ml.api_helper module to get the list of features.
+    
+    Returns:
+        List[str]: The list of features.
+    """
+    config = {
+        'data_dir': os.path.join('..', 'data', 'zillow'),
+    }
+    return api_helper.get_features_list(config, state, region)
 
 
