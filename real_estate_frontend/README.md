@@ -1,24 +1,15 @@
-# real_estate_frontend
-
-## Project setup
 ```
-npm install
+── real_estate_frontend/        # Frontend (Vue.js) Directory
+│   ├── public/
+│   │   └── index.html           # Main HTML file
+│   ├── src/
+│   │   ├── assets/              # Static assets like images and fonts
+│   │   ├── components/          # Vue.js components
+│   │   │   ├── Forecast.vue     # Search and display of historical data and forecast
+│   │   ├── App.vue              # Main Vue.js application component
+│   │   ├── main.js              # Entry point for Vue.js app
+│   ├── Dockerfile               
+│   ├── package.json             
+│   ├── package-lock.json        
+│   └── README.md                
 ```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
