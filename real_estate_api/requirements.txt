@@ -1,4 +1,10 @@
-fastapi
-uvicorn
-sqlalchemy
-pydantic
+fastapi # ==0.112.1
+numpy # ==1.21.6 # 2.1.0
+pandas # ==2.2.2
+pydantic # ==2.8.2
+scikit_learn # ==1.5.1
+SQLAlchemy # ==2.0.32
+tensorflow # ==2.17.0
+# tensorflow_intel==2.17.0
+tqdm # ==4.66.5
+uvicorn # ==0.15.0

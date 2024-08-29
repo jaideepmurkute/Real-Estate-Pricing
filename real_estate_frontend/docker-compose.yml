@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: frontend_img:v1
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    command: ["serve", "-s", "dist", "-l", "8080"]

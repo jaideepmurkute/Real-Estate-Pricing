@@ -1,4 +1,22 @@
 
+
+<!--
+  File: Forecast.vue
+  
+  The component responsible for displaying the real estate forecast data. 
+  
+  Includes dropdowns for selecting state, region, and feature, and displays 
+    historical data in a table and chart format. 
+  
+  Also shows the forecasted value.
+
+  Sections:
+    - HTML Template; Javascript Functions; CSS Styles.
+
+  Author: ''
+  Date: ''
+-->
+
 <!-- ------------------ HTML Template ------------------------ -->
 <template>
   <div>
@@ -66,15 +84,12 @@ export default {
   setup() {
     const states = ref([]);
     const regions = ref([]);
-    // const features = ref(['Price', 'Ratio']);
-    // const features = ref(['Mean Sale Price', 'Median Sale Price', 
-    //                 'Pct. Sold Above List', 'Pct. Sold Below List', 
-    //                 'Sale Price to List Ratio',
-    //               ]);
     const features = ref([]);
+
     const selectedState = ref('');
     const selectedRegion = ref('');
     const selectedFeature = ref('');
+    
     const historicalData = ref([]);
     const forecast = ref(null);
     const chartInstance = ref(null); // Ref to store the chart instance
@@ -88,7 +103,7 @@ export default {
         console.error('Error fetching states:', error);
       }
     };
-
+    
     const fetchRegions = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/regions?state=${selectedState.value}`);
@@ -101,6 +116,7 @@ export default {
 
     const fetchFeatures = async () => {
       try {
+        // console.log("Fetching features for state:", selectedState.value, "and region:", selectedRegion.value);
         const response = await axios.get(`http://localhost:8000/features?state=${selectedState.value}&region=${selectedRegion.value}`);
         // console.log('Features fetched:', response.data);
         features.value = response.data;
@@ -118,7 +134,7 @@ export default {
         // console.log('Historical Data:', historicalData.value);
         // console.log('Forecast:', forecast.value);
         await nextTick(); // Ensures DOM is updated before rendering the chart
-        updateChart(); // Update the chart with new data
+        updateChart();  // Update the chart with new data
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -160,7 +176,7 @@ export default {
     // Create a new chart and update the existing chart
     const updateChart = () => {
       if (chartInstance.value) {
-        chartInstance.value.destroy(); // Destroy the existing chart instance
+        chartInstance.value.destroy();  // Destroy the existing chart instance
       }
       renderChart(); // Create a new chart instance with updated data
     };
@@ -173,21 +189,22 @@ export default {
       fetchStates();
     });
 
-    // Watch for changes in selectedState and selectedRegion and fetch features accordingly
     watch([selectedState, selectedRegion], ([newState, newRegion]) => {
       if (newState && newRegion) {
         fetchFeatures();
       }
     });
     
+    
     return {
       states,
       regions,
       features,
-      //fetchFeatures,
+      
       selectedState,
       selectedRegion,
       selectedFeature,
+
       historicalData,
       forecast,
       fetchRegions,
@@ -201,7 +218,7 @@ export default {
 <!-- ---------------- CSS Styles ------------------------ -->
 <style scoped>
 .dropdown {
-  width: 200px; /* Set a fixed width for the dropdowns */
+  width: 200px;  /* Set a fixed width for the dropdowns; rather than data-dependent/variable */
 }
 
 .dropdown-container {
@@ -228,12 +245,12 @@ button {
 
 .data-table-container {
   width: 45%;
-  text-align: center; /* Center align the header */
+  text-align: center; /* Center align the core part */
 }
 
 .data-table {
-  width: 100%; /* Ensure the table takes the full width of the container */
-  margin-top: 10px; /* Add some space between the header and the table */
+  width: 100%;      /* To ensure the table takes the full width of the container */
+  margin-top: 10px; /* Space between the header and the table */
 }
 
 .chart-container {

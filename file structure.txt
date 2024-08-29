@@ -1,45 +1,48 @@
-real_estate_project/
+Real-Estate-Pricing/
 │
-├── data/                        # Data Directory
-│   ├── raw/                     # Raw Zillow dataset files
-│   ├── processed/               # Processed data files (after cleaning, transformation)
-│   └── README.md                # Documentation for data directory
+├── data/                           # Data Store Directory
+│   ├── zillow/                     # Zillow dataset
+│   │   ├── region_data_store/      # Per-region data files
+│   │   └── original_data           # Original data files from zillow - per indicator
+|   └── README.md                   # Data store Documentation 
 |
 ├── data_analysis_preprocessing/                    # Data Analysis Directory
-│   ├── analysis_EDA.ipynb        # Jupyter notebook for exploratory data analysis (EDA)
-│   ├── data_cleaning.py         # Script for cleaning and preprocessing data
-│   |── utils.py                # utility functions
-│   └── README.md                # Documentation for analysis directory
+│   ├── analysis_EDA.ipynb          # Jupyter notebook for exploratory data analysis (EDA)
+│   ├── data_cleaning.py            # Script for cleaning and preprocessing data
+│   |── utils.py                    # utility functions
+│   └── README.md                   # Data Analysis Documentation 
 |
-├── ml/                          # Machine Learning Directory
-│   ├── model_training.py        # Script for training the ML model
-│   ├── model_evaluation.py      # Script for evaluating the ML model
-|   |── feature_engineering.py   # Script for feature extraction/engineering
-│   ├── models_store/            # Directory to save trained models
-│   │   └── price_model.pkl      # Serialized ML model
-│   ├── prediction.py            # Script for making predictions with the ML model
-|   |── utils.py                 # utility functions for modeling
-│   └── README.md                # Documentation for ML directory
+├── ml/                             # Machine Learning Dev & communications Directory
+│   ├── training.py                 # ML model training and evaluation - local only
+│   ├── prediction.py               # Evaluating the ML model - local only
+|   |── api_helper.py               # Processes requests from the FastAPI and returns requested data/forecast
+|   |── generate_cols_to_use.py     # To generate dictionary of dates/columns to use - local only
+|   |── generate_regionwise_data.py # Script to generate data files for each region - local only
+│   ├── models_store/               # Directory containing dirs for each region with saved trained models, scalers etc.
+│   ├── prediction.py               # Script for making predictions with the ML model
+|   |── utils.py                    # General utility functions for modeling/eval/prediction etc.
+│   |── requirements.txt            # Python dependencies for the ML module
+    └── README.md                   # ML Documentation 
 │
-├── real_estate_api/             # Backend (FastAPI) Directory
+├── real_estate_api/                # Backend (FastAPI) Directory
 │   ├── app/
 │   │   ├── __init__.py
-│   │   ├── main.py              # Main FastAPI application
-│   │   ├── models.py            # Data models (if any)
-│   │   ├── schemas.py           # Pydantic schemas for data validation
-│   │   ├── crud.py              # Functions to interact with the database
-│   │   ├── database.py          # Database connection and setup
+│   │   ├── main.py                 # Main FastAPI application
+│   │   ├── api_requestor.py        # Generates requests and sends to appropriate modules(ex. ML) to fetch response
+│   │   ├── schemas.py              # Pydantic schemas for data validation
+│   │   ├── crud.py                 # Functions to interact with the database
+│   │   ├── database.py             # Database connection and setup
 │   │   ├── routers/
 │   │   │   ├── __init__.py
-│   │   │   ├── properties.py    # Endpoints for property-related operations
-│   │   │   ├── search.py        # Endpoints for search operations
-│   │   └── utils.py             # Utility functions
-│   ├── tests/                   # Test cases for backend
+│   │   │   ├── properties.py       # Endpoints for property-related operations
+│   │   │   ├── search.py           # Endpoints for search operations
+│   │   └── utils.py                # Utility functions
+│   ├── tests/                      # Test cases for backend
 │   │   ├── __init__.py
 │   │   └── test_main.py
-│   ├── Dockerfile               # Dockerfile for backend
-│   ├── requirements.txt         # Python dependencies
-│   └── README.md                # Documentation for backend
+│   ├── Dockerfile                  # Dockerfile for backend
+│   ├── requirements.txt            # Python dependencies for API module
+|   └── README.md                   # Backend Documentation
 │
 ├── real_estate_frontend/        # Frontend (Vue.js) Directory
 │   ├── public/
@@ -47,17 +50,14 @@ real_estate_project/
 │   ├── src/
 │   │   ├── assets/              # Static assets like images and fonts
 │   │   ├── components/          # Vue.js components
-│   │   │   ├── MapView.vue      # Component for displaying the map
-│   │   │   ├── SearchForm.vue   # Component for search form
-│   │   │   └── PropertyList.vue # Component for listing properties
-│   │   ├── views/               # Views for different pages
-│   │   │   └── Home.vue         # Main home view
+│   │   │   ├── Forecast.vue     # Component for Search and display of historical data and forecast
 │   │   ├── App.vue              # Main Vue.js application component
 │   │   ├── main.js              # Entry point for Vue.js app
 │   ├── Dockerfile               # Dockerfile for frontend
 │   ├── package.json             # Node.js dependencies
 │   ├── package-lock.json        # Lockfile for Node.js dependencies
-│   └── README.md                # Documentation for frontend
+│   └── README.md                # Frontend Documentation
 │
 ├── docker-compose.yml           # Docker Compose file to manage both services
+|── requirements.txt             # Python dependencies for whole project - dev + backend + frontend
 └── README.md                    # Project documentation

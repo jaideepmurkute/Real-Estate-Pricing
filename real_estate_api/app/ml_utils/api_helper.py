@@ -18,6 +18,7 @@ import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
 
+# from .utils import *
 from .utils import *
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -218,7 +219,9 @@ def get_states_list(config: Dict) -> List[str]:
     monthly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_month.csv'
     # weekly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_week.csv',
     
-    df = pd.read_csv(os.path.join(config['data_dir'], monthly_ref_fname))
+    fpath = os.path.join(config['data_dir'], monthly_ref_fname)
+    
+    df = pd.read_csv(fpath)
     df.dropna(subset=["StateName"], inplace=True)
     states_list = df["StateName"].unique().tolist()
     
@@ -229,7 +232,6 @@ def get_state_regions(config: Dict, state: str) -> List[str]:
     # weekly_ref_fname = 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_week.csv',
     
     df = pd.read_csv(os.path.join(config['data_dir'], monthly_ref_fname))
-    # state_regions_dict = df.groupby("StateName")["RegionName"].unique().to_dict()
     
     df = df[df["StateName"] == state]
     df.dropna(subset=["RegionName"], inplace=True)
@@ -241,11 +243,8 @@ def get_features_list(config: Dict, state: str, region: str) -> List[str]:
     # as of now, not choosing between month and week; since as of now we select state first; 
     # without selecting the granularity
     
-    config = {
-        'region_data_store_dir': os.path.join(config['data_dir'], 'region_data_store'),
-        'region_name': region,
-        'granularity': 'month',
-    }
+    config['region_name'] = region
+    config['granularity'] = 'month'
     
     df = get_region_data(config, config['granularity'], region)
     

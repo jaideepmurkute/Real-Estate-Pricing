@@ -1,62 +1,63 @@
 
+<!--
+  The main component of the Real Estate Pricing Search & Forecast application. 
+  Sets up the basic structure of the application, including the header and the main ForecastChart component.
+  
+  Author: ''
+  Date: ''
+-->
+
+<!-- --------------------- HTML Template ---------------------- -->
 <template>
   <div id="app">
-    <router-view/>
+    <div class="header-container">
+      <img alt="Vue logo" src="./assets/logo.png" class="logo">
+      <h1>Real Estate Pricing Search & Forecast</h1>
+    </div>
+    <ForecastChart />
   </div>
 </template>
 
+<!-- --------------------- Javascript functions ---------------------- -->
 <script>
+import ForecastChart from './components/Forecast.vue';
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    ForecastChart
+  }
 }
 </script>
 
+<!-- --------------------- CSS Styles ---------------------- -->
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: beige; /* Set background color to beige */
+}
 
-<!-- Includes the search form, property list, and map view
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 20px;
+  min-height: 100%; /* Ensure the app div takes at least the full height of the viewport */
+}
 
-<template>
-    <div id="app">
-      <SearchForm @search="handleSearch" />
-      <PropertyList :properties="properties" />
-      <MapView :properties="properties" />
-    </div>
-  </template>
-  
-  <script>
-  import SearchForm from './components/SearchForm.vue';
-  import PropertyList from './components/PropertyList.vue';
-  import MapView from './components/MapView.vue';
-  
-  export default {
-    components: {
-      SearchForm,
-      PropertyList,
-      MapView
-    },
-    data() {
-      return {
-        properties: []
-      };
-    },
-    methods: {
-      async handleSearch(criteria) {
-        // Fetch properties based on search criteria
-        const response = await fetch(`http://127.0.0.1:8000/properties?city=${criteria.city}&state=${criteria.state}&zip_code=${criteria.zip_code}`);
-        this.properties = await response.json();
-      }
-    }
-  };
-  </script>
-  
-  <style>
-  #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  }
-  </style>
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px; /* Add some space below the header */
+}
 
-   -->
+.logo {
+  width: 100px; /* Adjust the width as needed */
+  height: auto; /* Maintain aspect ratio */
+  margin-right: 10px; /* Add some space between the logo and the title */
+}
+</style>

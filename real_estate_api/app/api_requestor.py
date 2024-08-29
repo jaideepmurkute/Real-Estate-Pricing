@@ -1,35 +1,36 @@
 
+'''
+    Module to handle the API requests for the real estate pricing data and forecasting; 
+    from the ml module - which interacts with the data, models and generates forecasts.
+    
+    Functions in this module are called by the FastAPI endpoints in the main.py module.
+    
+    __author__ = ''
+    __email__ = ''
+    __version__ = '1.0.0'
+'''
 import os
 import sys
 from typing import Dict, Optional, Tuple, List, Union
 
-import numpy as np
-import pandas as pd
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+# import ml.api_helper as api_helper
+from .ml_utils import api_helper as api_helper
 
-# sys.path.append(os.path.abspath("../../ml")) # to import ml modules
+def add_paths(config):
+    # For non-dockerized version
+    # config['data_dir'] = os.path.join('..', 'data', 'zillow')
+    # config['region_data_store_dir'] = os.path.join(config['data_dir'], 'region_data_store')
+    # config['model_store_dir'] = os.path.join('..', 'ml', 'model_store')
 
-# ml_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'ml'))
-# print("ml_path:", ml_path)
-# sys.path.append(ml_path)
+    # for Docker deployment
+    config['data_dir'] = os.path.join('data', 'zillow')
+    config['region_data_store_dir'] = os.path.join(config['data_dir'], 'region_data_store')
+    config['model_store_dir'] = os.path.join('model_store')
+    
+    return config
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'ml')))
-
-import ml.api_helper as api_helper
-# from ml.api_helper import *
-# from ml.api_helper import data_
-# from ml.api_helper import *
-# from ml.api_helper import *
-
-'''
-Real-Estate-Pricing/
-├── ml/
-│   └── api_helper.py
-└── real_estate_api/
-    └── app/
-        └── api_requestor.py
-'''
 def generate_prediction_config(region_name: str, granularity: str, look_back: int) -> Dict:
     '''
         Generate the configuration dictionary for the ml.prediction module
@@ -37,6 +38,7 @@ def generate_prediction_config(region_name: str, granularity: str, look_back: in
         # NOTE: paths in this dict should be relative to the location of the ml module's script since this is being 
         # passed to the ml module
     '''
+    # current_file_dir = os.path.dirname(os.path.abspath(__file__))
     config = {
         'region_name': region_name, #'Adrian, MI', 
         'granularity': granularity, # 'month',
@@ -49,22 +51,15 @@ def generate_prediction_config(region_name: str, granularity: str, look_back: in
         'handle_outliers': False,
         
         'seed': 42, 
-        
-        
-        'data_dir': os.path.join('..', 'data', 'zillow'), 
-        'region_data_store_dir': os.path.join('..', 'data', 'zillow', 'region_data_store'),
-        
-        'model_store_dir': os.path.join('model_store'),
     }
     
-    ml_module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'ml'))
-    project_home_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-    config['data_dir'] = os.path.join(project_home_dir, 'data', 'zillow')
-    config['region_data_store_dir'] = os.path.join(project_home_dir, 'data', 'zillow', 'region_data_store')
-    config['model_store_dir'] = os.path.join(ml_module_path, 'model_store')
+    config = add_paths(config)
     
     return config
-    
+
+def get_generatal_config() -> Dict:
+    config = add_paths({})
+    return config
     
 def data_and_forecast_requestor(state: str, region_name: str, feature: str, granularity: str, 
                                 look_back: int) -> int:
@@ -93,9 +88,7 @@ def state_list_requestor() -> List[str]:
     Returns:
         List[str]: The list of states.
     """
-    config = {
-        'data_dir': os.path.join('..', 'data', 'zillow'),
-    }
+    config = get_generatal_config()
     return api_helper.get_states_list(config)
 
 def state_regions_requestor(state: str) -> List[str]:
@@ -108,9 +101,7 @@ def state_regions_requestor(state: str) -> List[str]:
     Returns:
         List[str]: The list of regions for the given state.
     """
-    config = {
-        'data_dir': os.path.join('..', 'data', 'zillow'),
-    }
+    config = get_generatal_config()
     return api_helper.get_state_regions(config, state)
 
 def feature_list_requestor(state: str, region: str) -> List[str]:
@@ -121,9 +112,7 @@ def feature_list_requestor(state: str, region: str) -> List[str]:
     Returns:
         List[str]: The list of features.
     """
-    config = {
-        'data_dir': os.path.join('..', 'data', 'zillow'),
-    }
+    config = get_generatal_config()
     return api_helper.get_features_list(config, state, region)
 
 

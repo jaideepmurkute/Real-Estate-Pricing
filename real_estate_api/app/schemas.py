@@ -1,8 +1,19 @@
 '''
     Define the Pydantic schemas for data validation.
+    
+    NOTE: Indiv
 '''
 
+from typing import List
 from pydantic import BaseModel
+
+class HistoricalData(BaseModel):
+    Date: str
+    Price: float
+
+class ForecastResponse(BaseModel):
+    historical: List[HistoricalData]
+    forecast: float
 
 class PropertyBase(BaseModel):
     address: str

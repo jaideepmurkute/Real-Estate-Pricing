@@ -20,7 +20,6 @@ from tqdm import tqdm
 
 from .utils import *
 
-# ---------------------------------------------------------------
 
 def evaluate_model(model: tf.keras.models.Sequential, scaler: BaseEstimator, trainX: pd.DataFrame, 
                    trainY: pd.DataFrame, testX: pd.DataFrame, testY: pd.DataFrame, 
@@ -57,9 +56,9 @@ def evaluate_model(model: tf.keras.models.Sequential, scaler: BaseEstimator, tra
     
 
 class QuietCallback(tf.keras.callbacks.Callback):
-    '''
+    """
         A callback class to suppress the output of the model training.
-    '''
+    """
     def on_epoch_end(self, epoch, logs=None):
         pass
 
@@ -69,10 +68,12 @@ class QuietCallback(tf.keras.callbacks.Callback):
 def train_model(config: Dict[str, Any], df: pd.DataFrame, verbose: bool = False) -> None:
     """
     Train the machine learning model on the given dataframe.
+    
     Parameters:
         config (Dict[str, Any]): The configuration dictionary.
         df (pd.DataFrame): The input dataframe.
         verbose (bool): Whether to print verbose output. Default is False.
+    
     Returns:
         None
     """
@@ -118,12 +119,19 @@ def train_model(config: Dict[str, Any], df: pd.DataFrame, verbose: bool = False)
             print('-'*30)
             print('-'*30)
 
-# @tf.function(reduce_retracing=True)
-def predict_with_model(model, X):
-    return model.predict(X)
     
 def test_model(config, test_df, train_df=None):
+    """
+    Generate predictions for the test data.
     
+    Parameters:
+        config (Dict): The configuration dictionary.
+        test_df (pd.DataFrame): The test dataframe.
+        train_df (pd.DataFrame): The training dataframe. Default is None.
+    
+    Returns:
+        np.ndarray: The predictions for the test data.
+    """    
     per_fold_preds = []
     for fold_idx in range(config['n_folds']):
         scaler = load_scaler(config, fold_idx)
@@ -137,7 +145,7 @@ def test_model(config, test_df, train_df=None):
         
         preds = []
         for batch in dataset:
-            batch_preds = predict_with_model(model, batch)
+            batch_preds = model.predict(batch)
             preds.append(batch_preds)
         
         preds = np.concatenate(preds, axis=0)

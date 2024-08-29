@@ -166,21 +166,9 @@ def predict(config: Dict, forecast_date: Optional[str]=None, return_data: Option
     # can use following: index for : 
     # 'Metro_median_sale_price_uc_sfrcondo_sm_sa_month'
     # 'Metro_mean_sale_price_uc_sfrcondo_sm_sa_month'
-    feat_to_return = f'Metro_{config['return_aggr_type']}_{config['return_data_type']}_uc_sfrcondo_sm_sa_{config["granularity"]}'
-    # print("prediction: ", aggr_preds_df[feat_to_return])
+    # feat_to_return = f'Metro_{config['return_aggr_type']}_{config['return_data_type']}_uc_sfrcondo_sm_sa_{config["granularity"]}'
     
-    # if return_data:
-    #     ret_df = train_df.reset_index()[["Date", feat_to_return]]
-    #     ret_df.rename(columns={feat_to_return: 'Price'}, inplace=True)
-    #     print("cols in ret_df after reset_index: ", ret_df.columns)
-    #     print("Returning data...")
-    #     print(ret_df)
-        
-    #     print('-----------------')
-    #     return aggr_preds_df[feat_to_return], train_df[['Date', feat_to_return]]
     
-    # return aggr_preds_df[feat_to_return], None
-
 
 if __name__ == '__main__':
     config = {
