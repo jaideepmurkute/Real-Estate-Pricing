@@ -56,14 +56,14 @@ docker-compose down --rmi all
 ```
 
 ## Tech Stack
-* Database
-  * MySQL, SQLAlchemy
-* Backend
-  * Core Programming: Python
-  * Machine/Deep Learning: TensorFlow
-  * REST Data API: FastAPI
 * Frontend: 
   * VueJS, HTML, CSS
+* Backend
+  * REST API: FastAPI
+  * Core Programming: Python
+  * Machine/Deep Learning: TensorFlow
+* Database
+  * MySQL, SQLAlchemy
 * Testing: 
   * PyTest
 * Version Control: 
