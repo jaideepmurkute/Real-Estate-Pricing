@@ -209,7 +209,7 @@ def get_model(config: Dict, train_X: pd.DataFrame, train_Y: Optional[pd.DataFram
     
     return model
 
-def adjust_index(df: Dict):
+def adjust_index(df: pd.DataFrame) -> pd.DataFrame:
     """
     Adjusts the index of a DataFrame - reset and rename the current index with feature_name column.
     Assign a new numeric index for compatibility with other data pre-processing functions.
@@ -241,7 +241,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     date_cols = df.columns.tolist()[1:]
     
     # fill intermedite missing values using cubic interpolation
-    df.loc[:, date_cols] = df[date_cols].interpolate(method='cubic', axis=0, inplace=False)
+    df.loc[:, date_cols] = df[date_cols].interpolate(method='linear', axis=0, inplace=False)
 
     # fill remaining missing values using forward and backward fill
     df.loc[:, date_cols] = df[date_cols].ffill(axis=1, inplace=False)
@@ -249,7 +249,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     
     return df
 
-def preprocess_dataframe(df: Dict) -> pd.DataFrame:
+def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
     Preprocesses the input dataframe by adjusting the index, handling missing values,
     dropping unwanted columns, and adjusting shapes for model compatibility.
@@ -288,6 +288,13 @@ def save_model(config: Dict, model: tf.keras.models.Sequential, fold_idx: Option
     Returns:
         None
     """
+    if not isinstance(model, tf.keras.models.Sequential):
+        raise ValueError("The model should be an instance of tf.keras.models.Sequential class.")
+    if not isinstance(fold_idx, (int, type(None))):
+        raise ValueError("The fold index should be an integer or None.")
+    if not isinstance(config, dict):
+        raise ValueError("The config should be a dictionary.")
+
     if fold_idx is None:
         fold_idx = ''
     
@@ -298,7 +305,7 @@ def save_model(config: Dict, model: tf.keras.models.Sequential, fold_idx: Option
     
     model.save(save_fpath + '.' + extension)
   
-def load_model(config: Dict, fold_idx: int) -> tf.keras.models.Sequential:
+def load_model(config: Dict, fold_idx: Optional[int]=None) -> tf.keras.models.Sequential:
     """
     Load a trained tf.keras model from a file.
     Args:
@@ -307,11 +314,22 @@ def load_model(config: Dict, fold_idx: int) -> tf.keras.models.Sequential:
     Returns:
         tf.keras.models.Sequential: The loaded model.
     """
+    if not isinstance(config, dict):
+        raise ValueError("The config should be a dictionary.")
+    if not isinstance(fold_idx, (int, type(None))):
+        raise ValueError("The fold index should be an integer or None.")
+    
+    if fold_idx is None:
+        fold_idx = ''
     save_fname = f'model_{config['region_name']}_{config['granularity']}_fold_{fold_idx}'
     save_fpath = os.path.join(config['region_model_store_dir'], save_fname)
     extension = 'keras'
     
-    model = tf.keras.models.load_model(save_fpath + '.' + extension)
+    save_fpath = save_fpath + '.' + extension
+    if not os.path.exists(save_fpath):
+        raise FileNotFoundError(f"Model file {save_fpath} not found.")
+    
+    model = tf.keras.models.load_model(save_fpath)
     return model
 
 def save_scaler(config: Dict, scaler: BaseEstimator, fold_idx: int) -> None:

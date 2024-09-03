@@ -18,7 +18,7 @@ import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
 
-from .utils import *
+from utils import *
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.get_logger().setLevel('ERROR')
@@ -91,7 +91,7 @@ def test_model(config: Dict, test_df: pd.DataFrame,
     
     return aggr_preds
 
-def update_forecast_date(config: dict, train_df: pd.DataFrame, forecast_date: Optional[str]=None) -> str:
+def update_forecast_date(config: dict, df: pd.DataFrame, forecast_date: Optional[str]=None) -> str:
     """
     Takes in a forecast date and performs adjustments based on the valid values range from the \
     available train data.
@@ -104,7 +104,7 @@ def update_forecast_date(config: dict, train_df: pd.DataFrame, forecast_date: Op
     
     Args:
         config (dict): Configuration dictionary.
-        train_df (pd.DataFrame): DataFrame containing the train data.
+        df (pd.DataFrame): DataFrame containing the data with dates as index.
         forecast_date (str, optional): The forecast date to be adjusted. Defaults to None.
     Returns:
         str: The adjusted forecast date.
@@ -112,18 +112,25 @@ def update_forecast_date(config: dict, train_df: pd.DataFrame, forecast_date: Op
         ValueError: If the forecast date does not meet the criteria specified in the conditions.
     """
     
-    if forecast_date is None:
-        forecast_date = train_df.index[-1]
-    elif forecast_date < train_df.index[0]:
-        forecast_date = train_df.index[0]
-    elif forecast_date > train_df.index[-1]:
-        forecast_date = train_df.index[-1]
-    elif forecast_date not in train_df.index:
-        # if forecast date is not present in the data, then take the nearest date
-        forecast_date = train_df.index[train_df.index.get_loc(forecast_date, method='nearest')]
-    else:
-        raise ValueError("Invalid forecast date")
+    if not isinstance(forecast_date, pd.Timestamp):
+        forecast_date = pd.to_datetime(forecast_date, format='%Y-%m-%d', errors='coerce')
     
+    if forecast_date in df.index:
+        return forecast_date
+    else:
+        if forecast_date is None:
+            forecast_date = df.index[-1]
+        elif forecast_date < df.index[0]:
+            forecast_date = df.index[0]
+        elif forecast_date > df.index[-1]:
+            forecast_date = df.index[-1]
+        elif forecast_date not in df.index:
+            # if forecast date is not present in the data, then take the nearest date
+            nearest_index = df.index.get_indexer([pd.Timestamp(forecast_date)], method='nearest')[0]
+            forecast_date = df.index[nearest_index]
+        else:
+            raise ValueError("Invalid forecast date")
+        
     return forecast_date
 
 def predict(config: Dict, requested_feature: str, forecast_date: Optional[str]=None, 
@@ -133,8 +140,10 @@ def predict(config: Dict, requested_feature: str, forecast_date: Optional[str]=N
     
     Args:
         config (Dict): A dictionary containing the configuration parameters.
-        forecast_date (Optional[str], optional): The forecast date in the format 'YYYY-MM-DD'. Defaults to None.
-        return_data (Optional[bool], optional): Whether to return the data used for forecasting. Defaults to False.
+        forecast_date (Optional[str], optional): The forecast date in the format 'YYYY-MM-DD'. 
+                Defaults to None.
+        return_data (Optional[bool], optional): Whether to return the data used for forecasting. 
+                Defaults to False.
     Returns:
         None
     """
