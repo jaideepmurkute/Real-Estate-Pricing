@@ -73,7 +73,7 @@ docker-compose down --rmi all
 * Documentation: 
   * WIP
 * Other Important Libraries:
-  * Data handling & Numerical functions: Pandas, Nump
+  * Data handling & Numerical functions: Pandas, Numpy
 
 
 ## License
