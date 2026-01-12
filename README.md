@@ -115,29 +115,7 @@ npm run serve
 ```
 Access the frontend at `http://localhost:8080`.
 
-<<<<<<< HEAD
 ---
-=======
-## Tech Stack
-* Frontend: 
-  * VueJS, HTML, CSS
-* Backend
-  * REST API: FastAPI
-  * Core Programming: Python
-  * Machine/Deep Learning: TensorFlow
-* Database
-  * MySQL, SQLAlchemy
-* Testing: 
-  * PyTest
-* Version Control: 
-  * Git
-* Deployment: 
-  * Docker, Uvicorn, npm
-* Documentation: 
-  * WIP
-* Other Important Libraries:
-  * Data handling & Numerical functions: Pandas, Numpy
->>>>>>> c3b1abc9984e8ade6793e245ed193c1a530fc80e
 
 ## 🧠 Machine Learning Pipeline
 
